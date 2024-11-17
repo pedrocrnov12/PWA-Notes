@@ -12,20 +12,18 @@ export default function Home() {
   const [content, setContent] = useState('');
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [notificationTime, setNotificationTime] = useState<string>('');
-  const [isClient, setIsClient] = useState(false);  // Para asegurarnos de que el código solo se ejecute en el cliente
+  const [isClient, setIsClient] = useState(false); // Asegurar que el código solo se ejecute en el cliente
 
-  // Función para obtener las notas
   const fetchNotes = async () => {
-    const response = await fetch('http://localhost:5000/api/notes');
+    const response = await fetch('https://simpleapi-production-e401.up.railway.app/api/notes');
     const data = await response.json();
     setNotes(data);
   };
 
-  // Función para agregar una nueva nota
   const addNote = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const response = await fetch('http://localhost:5000/api/notes', {
+    const response = await fetch('https://simpleapi-production-e401.up.railway.app/api/notes', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -37,17 +35,15 @@ export default function Home() {
       fetchNotes();
       resetForm();
 
-      // Si se programó una notificación, configurar el temporizador
       if (notificationTime) {
         scheduleNotification();
       }
     }
   };
 
-  // Función para actualizar una nota existente
   const updateNote = async (e: React.FormEvent) => {
     e.preventDefault();
-    const response = await fetch(`http://localhost:5000/api/notes/${editingNoteId}`, {
+    const response = await fetch(`https://simpleapi-production-e401.up.railway.app/api/notes/${editingNoteId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -60,30 +56,26 @@ export default function Home() {
     }
   };
 
-  // Función para eliminar una nota
   const deleteNote = async (id: string) => {
-    await fetch(`http://localhost:5000/api/notes/${id}`, {
+    await fetch(`https://simpleapi-production-e401.up.railway.app/api/notes/${id}`, {
       method: 'DELETE',
     });
     fetchNotes();
   };
 
-  // Función para editar una nota
   const handleEdit = (note: Note) => {
     setTitle(note.title);
     setContent(note.content);
     setEditingNoteId(note._id);
   };
 
-  // Función para resetear el formulario
   const resetForm = () => {
     setTitle('');
     setContent('');
     setEditingNoteId(null);
-    setNotificationTime(''); // Resetear el campo de hora
+    setNotificationTime('');
   };
 
-  // Función para enviar notificación
   const scheduleNotification = () => {
     const targetTime = new Date(notificationTime).getTime();
     const currentTime = new Date().getTime();
@@ -91,7 +83,6 @@ export default function Home() {
     if (targetTime > currentTime) {
       const timeToWait = targetTime - currentTime;
 
-      // Esperar hasta el momento de la notificación
       setTimeout(() => {
         new Notification('¡Recordatorio de Nota!', {
           body: `Es hora de revisar tu nota: ${title}`,
@@ -100,15 +91,14 @@ export default function Home() {
     }
   };
 
-  // Establecer que estamos en el cliente
   useEffect(() => {
-    setIsClient(true); // Marcar que ahora estamos en el cliente
-    fetchNotes(); // Obtener las notas del servidor
+    setIsClient(true);
+    fetchNotes();
   }, []);
 
-  // Solo renderizamos el formulario y el contenido cuando estemos en el cliente
   if (!isClient) {
-    return null; // Evitar que se renderice nada en el servidor
+    // Evitar renderizar contenido del cliente en el servidor
+    return null;
   }
 
   return (
