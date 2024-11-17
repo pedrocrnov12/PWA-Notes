@@ -1,5 +1,5 @@
 {
-    "name": "My PWA App",
+    "name": "SpeedNotes",
     "short_name": "PWA",
     "description": "A simple PWA example",
     "start_url": "/",
